@@ -1,11 +1,10 @@
-#include <tree_sitter/parser.h>
+#include "tree_sitter/parser.h"
 
 #if defined(__GNUC__) || defined(__clang__)
-#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #endif
 
-#define LANGUAGE_VERSION 13
+#define LANGUAGE_VERSION 14
 #define STATE_COUNT 25
 #define LARGE_STATE_COUNT 7
 #define SYMBOL_COUNT 29
@@ -16,7 +15,7 @@
 #define MAX_ALIAS_SEQUENCE_LENGTH 4
 #define PRODUCTION_ID_COUNT 1
 
-enum {
+enum ts_symbol_identifiers {
   anon_sym_ATstartuml = 1,
   anon_sym_ATenduml = 2,
   sym__unquoted_string = 3,
@@ -238,28 +237,56 @@ static const uint16_t ts_non_terminal_alias_map[] = {
   0,
 };
 
+static const TSStateId ts_primary_state_ids[STATE_COUNT] = {
+  [0] = 0,
+  [1] = 1,
+  [2] = 2,
+  [3] = 3,
+  [4] = 4,
+  [5] = 5,
+  [6] = 6,
+  [7] = 7,
+  [8] = 8,
+  [9] = 9,
+  [10] = 10,
+  [11] = 11,
+  [12] = 12,
+  [13] = 13,
+  [14] = 14,
+  [15] = 15,
+  [16] = 16,
+  [17] = 17,
+  [18] = 18,
+  [19] = 8,
+  [20] = 20,
+  [21] = 21,
+  [22] = 22,
+  [23] = 23,
+  [24] = 24,
+};
+
 static bool ts_lex(TSLexer *lexer, TSStateId state) {
   START_LEXER();
   eof = lexer->eof(lexer);
   switch (state) {
     case 0:
       if (eof) ADVANCE(90);
-      if (lookahead == '!') ADVANCE(26);
-      if (lookahead == '"') ADVANCE(89);
-      if (lookahead == '\'') ADVANCE(1);
-      if (lookahead == '@') ADVANCE(27);
-      if (lookahead == 'a') ADVANCE(17);
-      if (lookahead == 'b') ADVANCE(51);
-      if (lookahead == 'c') ADVANCE(50);
-      if (lookahead == 'd') ADVANCE(11);
-      if (lookahead == 'e') ADVANCE(46);
-      if (lookahead == 'p') ADVANCE(4);
-      if (lookahead == 'q') ADVANCE(80);
-      if (lookahead == 's') ADVANCE(34);
-      if (lookahead == '\t' ||
-          lookahead == '\n' ||
-          lookahead == '\r' ||
-          lookahead == ' ') SKIP(0)
+      ADVANCE_MAP(
+        '!', 26,
+        '"', 89,
+        '\'', 1,
+        '@', 27,
+        'a', 17,
+        'b', 51,
+        'c', 50,
+        'd', 11,
+        'e', 46,
+        'p', 4,
+        'q', 80,
+        's', 34,
+      );
+      if (('\t' <= lookahead && lookahead <= '\r') ||
+          lookahead == ' ') SKIP(0);
       END_STATE();
     case 1:
       if (lookahead == '\n') ADVANCE(95);
@@ -267,10 +294,8 @@ static bool ts_lex(TSLexer *lexer, TSStateId state) {
       END_STATE();
     case 2:
       if (lookahead == '"') ADVANCE(89);
-      if (lookahead == '\t' ||
-          lookahead == '\n' ||
-          lookahead == '\r' ||
-          lookahead == ' ') SKIP(2)
+      if (('\t' <= lookahead && lookahead <= '\r') ||
+          lookahead == ' ') SKIP(2);
       if (('0' <= lookahead && lookahead <= '9') ||
           ('A' <= lookahead && lookahead <= 'Z') ||
           lookahead == '_' ||
@@ -278,9 +303,7 @@ static bool ts_lex(TSLexer *lexer, TSStateId state) {
       END_STATE();
     case 3:
       if (lookahead == '"') ADVANCE(94);
-      if (lookahead == '\t' ||
-          lookahead == '\n' ||
-          lookahead == '\r' ||
+      if (('\t' <= lookahead && lookahead <= '\r') ||
           lookahead == ' ' ||
           lookahead == '!' ||
           ('0' <= lookahead && lookahead <= '9') ||
@@ -549,9 +572,7 @@ static bool ts_lex(TSLexer *lexer, TSStateId state) {
       if (lookahead == 'y') ADVANCE(99);
       END_STATE();
     case 89:
-      if (lookahead == '\t' ||
-          lookahead == '\n' ||
-          lookahead == '\r' ||
+      if (('\t' <= lookahead && lookahead <= '\r') ||
           lookahead == ' ' ||
           lookahead == '!' ||
           ('0' <= lookahead && lookahead <= '9') ||
@@ -970,11 +991,11 @@ static const TSParseActionEntry ts_parse_actions[] = {
   [0] = {.entry = {.count = 0, .reusable = false}},
   [1] = {.entry = {.count = 1, .reusable = false}}, RECOVER(),
   [3] = {.entry = {.count = 1, .reusable = true}}, SHIFT(3),
-  [5] = {.entry = {.count = 1, .reusable = true}}, REDUCE(aux_sym_document_repeat1, 2),
-  [7] = {.entry = {.count = 2, .reusable = true}}, REDUCE(aux_sym_document_repeat1, 2), SHIFT_REPEAT(2),
-  [10] = {.entry = {.count = 2, .reusable = true}}, REDUCE(aux_sym_document_repeat1, 2), SHIFT_REPEAT(14),
-  [13] = {.entry = {.count = 2, .reusable = true}}, REDUCE(aux_sym_document_repeat1, 2), SHIFT_REPEAT(20),
-  [16] = {.entry = {.count = 2, .reusable = true}}, REDUCE(aux_sym_document_repeat1, 2), SHIFT_REPEAT(17),
+  [5] = {.entry = {.count = 1, .reusable = true}}, REDUCE(aux_sym_document_repeat1, 2, 0, 0),
+  [7] = {.entry = {.count = 2, .reusable = true}}, REDUCE(aux_sym_document_repeat1, 2, 0, 0), SHIFT_REPEAT(2),
+  [10] = {.entry = {.count = 2, .reusable = true}}, REDUCE(aux_sym_document_repeat1, 2, 0, 0), SHIFT_REPEAT(14),
+  [13] = {.entry = {.count = 2, .reusable = true}}, REDUCE(aux_sym_document_repeat1, 2, 0, 0), SHIFT_REPEAT(20),
+  [16] = {.entry = {.count = 2, .reusable = true}}, REDUCE(aux_sym_document_repeat1, 2, 0, 0), SHIFT_REPEAT(17),
   [19] = {.entry = {.count = 1, .reusable = true}}, SHIFT(23),
   [21] = {.entry = {.count = 1, .reusable = true}}, SHIFT(5),
   [23] = {.entry = {.count = 1, .reusable = true}}, SHIFT(14),
@@ -985,32 +1006,36 @@ static const TSParseActionEntry ts_parse_actions[] = {
   [33] = {.entry = {.count = 1, .reusable = true}}, SHIFT(21),
   [35] = {.entry = {.count = 1, .reusable = true}}, SHIFT(4),
   [37] = {.entry = {.count = 1, .reusable = true}}, SHIFT(11),
-  [39] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym_participant, 2),
+  [39] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym_participant, 2, 0, 0),
   [41] = {.entry = {.count = 1, .reusable = true}}, SHIFT(18),
-  [43] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym_identifier, 1),
-  [45] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym_participant, 4),
-  [47] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym_subpart, 4),
-  [49] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym_subpart, 3),
-  [51] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym_skinparam, 3),
-  [53] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym_string, 1),
+  [43] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym_identifier, 1, 0, 0),
+  [45] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym_participant, 4, 0, 0),
+  [47] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym_subpart, 4, 0, 0),
+  [49] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym_subpart, 3, 0, 0),
+  [51] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym_skinparam, 3, 0, 0),
+  [53] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym_string, 1, 0, 0),
   [55] = {.entry = {.count = 1, .reusable = true}}, SHIFT(19),
   [57] = {.entry = {.count = 1, .reusable = true}}, SHIFT(13),
   [59] = {.entry = {.count = 1, .reusable = true}}, SHIFT(8),
-  [61] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym__participant_keyword, 1),
-  [63] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym_document, 3),
+  [61] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym__participant_keyword, 1, 0, 0),
+  [63] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym_document, 3, 0, 0),
   [65] = {.entry = {.count = 1, .reusable = true}},  ACCEPT_INPUT(),
-  [67] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym_document, 2),
-  [69] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym_source_file, 1),
+  [67] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym_document, 2, 0, 0),
+  [69] = {.entry = {.count = 1, .reusable = true}}, REDUCE(sym_source_file, 1, 0, 0),
 };
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-#ifdef _WIN32
-#define extern __declspec(dllexport)
+#ifdef TREE_SITTER_HIDE_SYMBOLS
+#define TS_PUBLIC
+#elif defined(_WIN32)
+#define TS_PUBLIC __declspec(dllexport)
+#else
+#define TS_PUBLIC __attribute__((visibility("default")))
 #endif
 
-extern const TSLanguage *tree_sitter_plantuml(void) {
+TS_PUBLIC const TSLanguage *tree_sitter_plantuml(void) {
   static const TSLanguage language = {
     .version = LANGUAGE_VERSION,
     .symbol_count = SYMBOL_COUNT,
@@ -1033,6 +1058,7 @@ extern const TSLanguage *tree_sitter_plantuml(void) {
     .alias_sequences = &ts_alias_sequences[0][0],
     .lex_modes = ts_lex_modes,
     .lex_fn = ts_lex,
+    .primary_state_ids = ts_primary_state_ids,
   };
   return &language;
 }
